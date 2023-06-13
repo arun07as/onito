@@ -45,4 +45,11 @@ class MovieController extends Controller
             'genreVotes' => $this->service->genreMoviesWithSubTotals()
         ]);
     }
+
+    public function updateRuntimeMinutes(): JsonResponse
+    {
+        $this->service->updateRuntimeMinutes();
+
+        return $this->sendResponse(message: 'Updated Successfully');
+    }
 }

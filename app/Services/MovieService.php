@@ -124,6 +124,26 @@ class MovieService
         return $result;
     }
 
+    public function updateRuntimeMinutes(): void
+    {
+        Movie::query()->update([
+            'runtime_minutes' => DB::raw(
+                <<<CASE_STATEMENT
+(CASE
+    WHEN
+        `movies`.`genres` = "Documentary"
+        THEN `movies`.`runtime_minutes` + 15
+    WHEN
+        `movies`.`genres` = "Animation"
+        THEN `movies`.`runtime_minutes` + 30
+    ELSE
+        `movies`.`runtime_minutes` + 45
+END)
+CASE_STATEMENT
+            )
+        ]);
+    }
+
     private function generateNewTConst(int $id): string
     {
         return 'tt' . str_pad((string) $id, 7, '0', STR_PAD_LEFT);
