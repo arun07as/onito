@@ -18,4 +18,5 @@ Route::prefix('v1')->group(function () {
     Route::get('longest-duration-movies', [MovieController::class, 'longestDurationMovies']);
     Route::post('new-movie', [MovieController::class, 'save']);
     Route::get('top-rated-movies', [MovieController::class, 'topRatedMovies']);
+    Route::get('genre-movies-with-subtotals', [MovieController::class, 'genreMoviesWithSubtotals']);
 });

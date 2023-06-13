@@ -2,9 +2,12 @@
 
 namespace App\Services;
 
+use App\Entities\GenreVotes;
 use App\Entities\MovieData;
 use App\Entities\MovieRating;
+use App\Entities\MovieVotes;
 use App\Models\Movie;
+use Illuminate\Support\Facades\DB;
 
 class MovieService
 {
@@ -82,6 +85,38 @@ class MovieService
             ),
             $movies
         );
+    }
+
+    public function genreMoviesWithSubTotals()
+    {
+        $moviesByGenre = Movie::select([
+            'genres',
+            'primary_title',
+            'num_votes'
+        ])
+            ->leftJoin('ratings', 'movies.tconst', '=', 'ratings.tconst')
+            ->get()
+            ->groupBy('genres');
+
+        $sumVotesByGenre = Movie::select([
+            'genres',
+            DB::raw('SUM(num_votes) as votes_sum')
+        ])
+            ->leftJoin('ratings', 'movies.tconst', '=', 'ratings.tconst')
+            ->groupBy('genres')
+            ->pluck('votes_sum', 'genres');
+
+
+        foreach ($moviesByGenre as $genre => $movies) {
+            yield new GenreVotes(
+                $genre,
+                $sumVotesByGenre[$genre] ?? 0,
+                $movies->map(fn (Movie $movie) => new MovieVotes(
+                    $movie->primary_title,
+                    $movie->num_votes
+                ))->all()
+            );
+        }
     }
 
     private function generateNewTConst(int $id): string
