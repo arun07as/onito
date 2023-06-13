@@ -155,7 +155,11 @@ return [
     |
     */
 
-    'providers' => ServiceProvider::defaultProviders()->merge([
+    'providers' => ServiceProvider::defaultProviders()->except([
+        \Illuminate\Auth\AuthServiceProvider::class,
+        \Illuminate\Broadcasting\BroadcastServiceProvider::class,
+        \Illuminate\Auth\Passwords\PasswordResetServiceProvider::class,
+    ])->merge([
         /*
          * Package Service Providers...
          */
@@ -178,7 +182,7 @@ return [
     |
     */
 
-    'aliases' => Facade::defaultAliases()->merge([
+    'aliases' => Facade::defaultAliases()->except(['Auth'])->merge([
         // 'Example' => App\Facades\Example::class,
     ])->toArray(),
 
