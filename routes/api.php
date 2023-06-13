@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\API\V1\MovieController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -18,4 +17,5 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('v1')->group(function () {
     Route::get('longest-duration-movies', [MovieController::class, 'longestDurationMovies']);
     Route::post('new-movie', [MovieController::class, 'save']);
+    Route::get('top-rated-movies', [MovieController::class, 'topRatedMovies']);
 });

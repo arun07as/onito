@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Entities\MovieData;
+use App\Entities\MovieRating;
 use App\Models\Movie;
 
 class MovieService
@@ -52,6 +53,35 @@ class MovieService
             $newMovie->tconst = $this->generateNewTConst($newMovie->id);
             $newMovie->save();
         }
+    }
+
+    /**
+     * @param float $averageRating
+     * @return MovieRating[]
+     */
+    public function topMovies(float $averageRating = 6.0): array
+    {
+        $movies = Movie::select([
+            'movies.tconst',
+            'primary_title',
+            'genres',
+            'average_rating'
+        ])
+            ->leftJoin('ratings', 'movies.tconst', '=', 'ratings.tconst')
+            ->where('average_rating', '>', $averageRating)
+            ->orderBy('average_rating', 'desc')
+            ->get()
+            ->all();
+
+        return array_map(
+            fn (Movie $movie) => new MovieRating(
+                $movie->tconst,
+                $movie->primary_title,
+                $movie->average_rating,
+                $movie->genres,
+            ),
+            $movies
+        );
     }
 
     private function generateNewTConst(int $id): string

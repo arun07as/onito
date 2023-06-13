@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\API\V1\SaveMovieRequest;
 use App\Presenter\MoviePresenter;
+use App\Presenter\MovieRatingPresenter;
 use App\Services\MovieService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -28,5 +29,12 @@ class MovieController extends Controller
     {
         $this->service->save($request->toEntity());
         return response('success');
+    }
+
+    public function topRatedMovies(): JsonResponse
+    {
+        return $this->sendResponse(
+            (new MovieRatingPresenter($this->service->topMovies()))->toArray()
+        );
     }
 }
