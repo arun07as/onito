@@ -17,4 +17,5 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
     Route::get('longest-duration-movies', [MovieController::class, 'longestDurationMovies']);
+    Route::post('new-movie', [MovieController::class, 'save']);
 });

@@ -8,13 +8,13 @@ class MovieData
 {
     public function __construct(
         private ?int $id,
-        private string $tconst,
+        private ?string $tconst,
         private string $titleType,
         private string $primaryTitle,
         private int $runtimeMinutes,
         private string $genres,
-        private ?DateTime $createdAt,
-        private ?DateTime $updatedAt,
+        private ?DateTime $createdAt = null,
+        private ?DateTime $updatedAt = null,
     ) {
     }
 
@@ -23,7 +23,7 @@ class MovieData
         return $this->id;
     }
 
-    public function getTconst(): string
+    public function getTconst(): ?string
     {
         return $this->tconst;
     }
