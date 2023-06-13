@@ -12,7 +12,7 @@ use Throwable;
 trait JsonResponses
 {
     public function sendResponse(
-        string|array|Stringable|Arrayable|JsonSerializable $data = [],
+        string|array|Stringable|Arrayable|JsonSerializable|null $data = [],
         int $statusCode = 200,
         string $message = 'Success',
         array $headers = []
@@ -28,7 +28,7 @@ trait JsonResponses
     public function sendError(
         string|Throwable $message = 'Technical Error. Please try again later',
         int $statusCode = 500,
-        string|array|Stringable|Arrayable|JsonSerializable $errors = [],
+        string|array|Stringable|Arrayable|JsonSerializable|null $errors = [],
         ?ErrorCodes $errorCode = null,
         array $headers = []
 
@@ -52,12 +52,15 @@ trait JsonResponses
 
     private function response(
         int $statusCode = 200,
-        string|array|Stringable|Arrayable|JsonSerializable $data = [],
+        string|array|Stringable|Arrayable|JsonSerializable|null $data = [],
         string $message = 'Success',
-        string|array|Stringable|Arrayable|JsonSerializable $errors = [],
+        string|array|Stringable|Arrayable|JsonSerializable|null $errors = [],
         ?ErrorCodes $errorCode = null,
         array $headers = []
     ): JsonResponse {
+        $data = $this->convertType($data);
+        $errors = $this->convertType($errors, []);
+
         return response()->json(
             [
                 'data' => $data,
@@ -68,5 +71,20 @@ trait JsonResponses
             $statusCode
         )
             ->withHeaders($headers);
+    }
+
+    private function convertType(
+        string|array|Stringable|Arrayable|JsonSerializable|null $data,
+        string|array|JsonSerializable|null $default = null
+    ): string|array|JsonSerializable|null {
+        if ($data instanceof Stringable) {
+            return $data->__toString();
+        } elseif ($data instanceof Arrayable) {
+            return $data->toArray();
+        }
+        if ($data === null && $default !== null) {
+            return $default;
+        }
+        return $data;
     }
 }
