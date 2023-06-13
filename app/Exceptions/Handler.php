@@ -40,10 +40,7 @@ class Handler extends ExceptionHandler
     public function render($request, Throwable $e)
     {
         /** @var \Illuminate\Http\Request $request */
-        if ($request->wantsJson() || request()->is('api/*')) {
-            return $this->convertExceptionToJsonResponse($e);
-        }
-        return parent::render($request, $e);
+        return $this->convertExceptionToJsonResponse($e);
     }
 
     /**
