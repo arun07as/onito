@@ -87,7 +87,10 @@ class MovieService
         );
     }
 
-    public function genreMoviesWithSubTotals()
+    /**
+     * @return GenreVotes[]
+     */
+    public function genreMoviesWithSubTotals(): array
     {
         $moviesByGenre = Movie::select([
             'genres',
@@ -107,8 +110,9 @@ class MovieService
             ->pluck('votes_sum', 'genres');
 
 
+        $result = [];
         foreach ($moviesByGenre as $genre => $movies) {
-            yield new GenreVotes(
+            $result[] = new GenreVotes(
                 $genre,
                 $sumVotesByGenre[$genre] ?? 0,
                 $movies->map(fn (Movie $movie) => new MovieVotes(
@@ -117,6 +121,7 @@ class MovieService
                 ))->all()
             );
         }
+        return $result;
     }
 
     private function generateNewTConst(int $id): string
