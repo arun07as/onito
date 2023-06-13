@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\API\V1\MovieController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -13,3 +14,7 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
+
+Route::prefix('v1')->group(function () {
+    Route::get('longest-duration-movies', [MovieController::class, 'longestDurationMovies']);
+});
