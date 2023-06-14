@@ -3,7 +3,9 @@
 namespace Tests\Feature\Services;
 
 use App\Entities\MovieData;
+use App\Entities\MovieRating;
 use App\Models\Movie;
+use App\Models\Rating;
 use App\Services\MovieService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -139,10 +141,66 @@ class MovieServiceTest extends TestCase
         $this->assertEquals($insertedData->genres, 'Action');
     }
 
-    private function generateMovies(int $count = 10)
+    public function testTopMoviesReturnsArrayOfMovieRating()
+    {
+        $insertData = $this->generateMoviesWithRating(20);
+
+        usort(
+            $insertData,
+            fn ($i, $j) => ($i['rating']['average_rating'] <=> $j['rating']['average_rating']) * -1
+        );
+        $insertData = array_filter($insertData, fn ($data) => $data['rating']['average_rating'] > 6);
+        $insertData = array_values($insertData);
+
+        $expectedResult = array_map(
+            fn (array $data) => new MovieRating(
+                $data['tconst'],
+                $data['primary_title'],
+                $data['rating']['average_rating'],
+                $data['genres']
+            ),
+            $insertData
+        );
+
+        $result = $this->service->topMovies();
+        $this->assertEquals($result, $expectedResult);
+    }
+
+    public function testTopMoviesReturnsArrayOfMovieRatingFilteredByMinAverageRating()
+    {
+        $insertData = $this->generateMoviesWithRating(20);
+
+        usort(
+            $insertData,
+            fn ($i, $j) => ($i['rating']['average_rating'] <=> $j['rating']['average_rating']) * -1
+        );
+        $insertData = array_filter($insertData, fn ($data) => $data['rating']['average_rating'] > 2);
+        $insertData = array_values($insertData);
+
+        $expectedResult = array_map(
+            fn (array $data) => new MovieRating(
+                $data['tconst'],
+                $data['primary_title'],
+                $data['rating']['average_rating'],
+                $data['genres']
+            ),
+            $insertData
+        );
+
+        $result = $this->service->topMovies(2);
+        $this->assertEquals($result, $expectedResult);
+    }
+
+    public function testTopMoviesReturnsEmptyArrayWhenNoMovies(): void
+    {
+        $result = $this->service->topMovies();
+        $this->assertEquals($result, []);
+    }
+
+    private function generateMovies(int $count = 10): array
     {
         $insertData = [];
-        for ($i = 0; $i < $count; $i++) {
+        for ($i = 1; $i <= $count; $i++) {
             $insertData[] = [
                 'id' => $i,
                 'tconst' => 'tt' . $i,
@@ -156,6 +214,27 @@ class MovieServiceTest extends TestCase
         }
 
         Movie::insert($insertData);
+
+        return $insertData;
+    }
+
+    private function generateMoviesWithRating(int $count = 10): array
+    {
+        $insertData = $this->generateMovies($count);
+
+        $ratingInsertData = [];
+        foreach ($insertData as $index => &$movieData) {
+            $data = [
+                'tconst' => $movieData['tconst'],
+                'average_rating' => $index % 10,
+                'num_votes' => rand(1, 10000),
+                'created_at' => Carbon::parse('2023-01-01T00:00:00+00:00')->addDay($index),
+                'updated_at' => Carbon::parse('2023-01-01T00:00:00+00:00')->addHour($index),
+            ];
+            $ratingInsertData[] = $data;
+            $movieData['rating'] = $data;
+        }
+        Rating::insert($ratingInsertData);
 
         return $insertData;
     }
