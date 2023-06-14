@@ -7,7 +7,7 @@ use App\Entities\MovieData;
 class MoviePresenter
 {
     public function __construct(
-        /** @var MovieData[] $movies */
+        /** @var MovieData[] */
         private array $movies
     ) {
     }
