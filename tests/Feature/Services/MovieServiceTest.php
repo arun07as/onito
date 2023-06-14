@@ -113,6 +113,32 @@ class MovieServiceTest extends TestCase
         $this->assertEquals($result, []);
     }
 
+    public function testSaveInsertsRecordIntoDatabase()
+    {
+        Carbon::setTestNow('2023-01-01T00:00:00+00:00');
+
+        $movie = new MovieData(
+            null,
+            null,
+            'movie',
+            'My movie',
+            120,
+            'Action'
+        );
+
+        $this->service->save($movie);
+
+        $insertedData = Movie::first();
+        $this->assertEquals(
+            $insertedData->tconst,
+            'tt' . str_pad((string) $insertedData->id, 7, '0', STR_PAD_LEFT)
+        );
+        $this->assertEquals($insertedData->title_type, 'movie');
+        $this->assertEquals($insertedData->primary_title, 'My movie');
+        $this->assertEquals($insertedData->runtime_minutes, 120);
+        $this->assertEquals($insertedData->genres, 'Action');
+    }
+
     private function generateMovies(int $count = 10)
     {
         $insertData = [];
