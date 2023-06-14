@@ -2,6 +2,7 @@
 - [Table Of Contents](#table-of-contents)
 - [System Requirements](#system-requirements)
 - [Installation](#installation)
+- [Running Tests](#running-tests)
 
 # System Requirements
 This Application uses the following
@@ -28,8 +29,15 @@ Next Run
 php artisan migrate --seed
 ```
 
-You can now run your application by running
+You can now run your application by running the following command from the project root directory
 ```sh
 php artisan serve
 ```
 and then opening your browser to http://127.0.0.1:8000/healthcheck
+
+
+# Running Tests
+You can run the following command to run tests
+```sh
+php artisan test
+```
