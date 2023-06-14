@@ -2,7 +2,9 @@
 
 namespace Tests\Unit\Traits;
 
+use App\Enums\ErrorCodes;
 use App\Traits\JsonResponses;
+use Exception;
 use Illuminate\Contracts\Support\Arrayable;
 use JsonSerializable;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -34,6 +36,31 @@ class JsonResponsesTest extends TestCase
         foreach ($expectedHeaders as $header => $value) {
             $this->assertEquals($value, $response->headers->all($header));
         }
+    }
+
+    #[DataProvider('sendErrorCases')]
+    public function testSendErrorReturnsErrorResponse(
+        array $arguments,
+        int $expectedStatusCode,
+        array $expectedResponse,
+        array $expectedHeaders
+    ): void {
+        $response = $this->responseGenerator->sendError(...$arguments);
+
+        $this->assertEquals($response->getStatusCode(), $expectedStatusCode);
+        $this->assertEquals($response->getData(true), $expectedResponse);
+
+        foreach ($expectedHeaders as $header => $value) {
+            $this->assertEquals($value, $response->headers->all($header));
+        }
+    }
+
+    public function testSendErrorThrowsSameErrorIfPassedErrorAsMessage()
+    {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Foo Bar');
+
+        $this->responseGenerator->sendError(new Exception('Foo Bar'));
     }
 
     public static function sendResponseCases(): array
@@ -140,6 +167,105 @@ class JsonResponsesTest extends TestCase
                     'error_code' => null
                 ],
                 ['Foo' => ['Bar']]
+            ],
+        ];
+    }
+
+    public static function sendErrorCases()
+    {
+        return [
+            'Simple Case' => [
+                [
+                    "Sample Error Message",
+                    400
+                ],
+                400,
+                [
+                    'data' => [],
+                    'message' => 'Sample Error Message',
+                    'errors' => [],
+                    'error_code' => null
+                ],
+                []
+            ],
+            'Default Response' => [
+                [],
+                500,
+                [
+                    'data' => [],
+                    'message' => 'Technical Error. Please try again later',
+                    'errors' => [],
+                    'error_code' => null
+                ],
+                []
+            ],
+            'Custom Message' => [
+                [
+                    'Custom Message'
+                ],
+                500,
+                [
+                    'data' => [],
+                    'message' => 'Custom Message',
+                    'errors' => [],
+                    'error_code' => null
+                ],
+                []
+            ],
+            'Array as Errors' => [
+                ['Message', 400, ['email' => ['Invalid']]],
+                400,
+                [
+                    'data' => [],
+                    'message' => 'Message',
+                    'errors' => ['email' => ['Invalid']],
+                    'error_code' => null
+                ],
+                []
+            ],
+            'Arrayable as Data' => [
+                ['Message', 400, new TempArrayable('World')],
+                400,
+                [
+                    'data' => [],
+                    'message' => 'Message',
+                    'errors' => ['Hello' => 'World'],
+                    'error_code' => null
+                ],
+                []
+            ],
+            'JsonSerializable as Data' => [
+                ['Msg', 400, new TempJsonSerializable('World')],
+                400,
+                [
+                    'data' => [],
+                    'message' => 'Msg',
+                    'errors' => ['Hello' => 'World'],
+                    'error_code' => null
+                ],
+                []
+            ],
+            'Custom Headers' => [
+                ['Message', 400, [], null, ['Foo' => 'Bar']],
+                400,
+                [
+                    'data' => [],
+                    'message' => 'Message',
+                    'errors' => [],
+                    'error_code' => null
+                ],
+                ['Foo' => ['Bar']]
+            ],
+            'Error code' => [
+                ['Message', 404, [], ErrorCodes::ROUTE_NOT_FOUND],
+                404,
+                [
+                    'data' => [],
+                    'message' => 'Message',
+                    'errors' => [],
+                    'error_code' => 'ROUTE_NOT_FOUND'
+                ],
+                []
             ],
         ];
     }

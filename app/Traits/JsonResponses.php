@@ -28,10 +28,9 @@ trait JsonResponses
     public function sendError(
         string|Throwable $message = 'Technical Error. Please try again later',
         int $statusCode = 500,
-        string|array|Stringable|Arrayable|JsonSerializable|null $errors = [],
+        array|Arrayable|JsonSerializable|null $errors = [],
         ?ErrorCodes $errorCode = null,
         array $headers = []
-
     ): JsonResponse {
 
         if ($message instanceof Throwable) {
@@ -54,7 +53,7 @@ trait JsonResponses
         int $statusCode = 200,
         string|array|Stringable|Arrayable|JsonSerializable|null $data = [],
         string $message = 'Success',
-        string|array|Stringable|Arrayable|JsonSerializable|null $errors = [],
+        array|Arrayable|JsonSerializable|null $errors = [],
         ?ErrorCodes $errorCode = null,
         array $headers = []
     ): JsonResponse {
