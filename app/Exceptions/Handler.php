@@ -50,7 +50,7 @@ class Handler extends ExceptionHandler
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function convertExceptionToJsonResponse(Throwable $e)
+    private function convertExceptionToJsonResponse(Throwable $e)
     {
         $message = $e->getMessage();
         $statusCode = 500;

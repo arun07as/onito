@@ -208,7 +208,7 @@ class MovieServiceTest extends TestCase
                 'title_type' => 'a',
                 'primary_title' => 'b',
                 'runtime_minutes' => 10,
-                'genres' => 'gn1',
+                'genres' => 'Documentary',
             ],
             [
                 'id' => 2,
@@ -216,7 +216,7 @@ class MovieServiceTest extends TestCase
                 'title_type' => 'aa',
                 'primary_title' => 'ba',
                 'runtime_minutes' => 15,
-                'genres' => 'gn2',
+                'genres' => 'Animation',
             ],
             [
                 'id' => 3,
@@ -224,7 +224,7 @@ class MovieServiceTest extends TestCase
                 'title_type' => 'aaa',
                 'primary_title' => 'baa',
                 'runtime_minutes' => 40,
-                'genres' => 'gn1',
+                'genres' => 'Documentary',
             ],
         ]);
 
@@ -250,11 +250,11 @@ class MovieServiceTest extends TestCase
         ]);
 
         $expectedResult = [
-            new GenreVotes('gn1', 130, [
+            new GenreVotes('Documentary', 130, [
                 new MovieVotes('b', 30),
                 new MovieVotes('baa', 100),
             ]),
-            new GenreVotes('gn2', 40, [
+            new GenreVotes('Animation', 40, [
                 new MovieVotes('ba', 40),
             ]),
         ];
@@ -268,6 +268,53 @@ class MovieServiceTest extends TestCase
     {
         $result = $this->service->genreMoviesWithSubTotals();
         $this->assertEquals($result, []);
+    }
+
+    public function testUpdateRuntimeMinutesUpdatesValuesCorrectly()
+    {
+        Movie::insert([
+            [
+                'id' => 1,
+                'tconst' => '1',
+                'title_type' => 'a',
+                'primary_title' => 'b',
+                'runtime_minutes' => 10,
+                'genres' => 'Documentary',
+            ],
+            [
+                'id' => 2,
+                'tconst' => '2',
+                'title_type' => 'aa',
+                'primary_title' => 'ba',
+                'runtime_minutes' => 15,
+                'genres' => 'Animation',
+            ],
+            [
+                'id' => 3,
+                'tconst' => '3',
+                'title_type' => 'aaa',
+                'primary_title' => 'baa',
+                'runtime_minutes' => 40,
+                'genres' => 'Documentary',
+            ],
+            [
+                'id' => 4,
+                'tconst' => '4',
+                'title_type' => 'aaaa',
+                'primary_title' => 'baaa',
+                'runtime_minutes' => 400,
+                'genres' => 'SomethingElse',
+            ],
+        ]);
+
+        $this->service->updateRuntimeMinutes();
+
+        $movies = Movie::orderBy('id')->find([1, 2, 3, 4]);
+
+        $this->assertEquals($movies[0]->runtime_minutes, 25);
+        $this->assertEquals($movies[1]->runtime_minutes, 45);
+        $this->assertEquals($movies[2]->runtime_minutes, 55);
+        $this->assertEquals($movies[3]->runtime_minutes, 445);
     }
 
     private function generateMovies(int $count = 10): array
