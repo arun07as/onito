@@ -46,7 +46,7 @@ class MovieAPITest extends TestCase
 
         $response = $this->get('/api/v1/longest-duration-movies');
 
-        $response->assertStatus(200);
+        $response->assertSuccessful();
         $response->assertExactJson([
             'data' => [
                 [
@@ -80,7 +80,7 @@ class MovieAPITest extends TestCase
 
         $response = $this->get('/api/v1/longest-duration-movies');
 
-        $response->assertStatus(200);
+        $response->assertSuccessful();
 
         $data = json_decode($response->getContent(), true)['data'];
         $this->assertCount(10, $data);
@@ -90,7 +90,7 @@ class MovieAPITest extends TestCase
     {
         $response = $this->get('/api/v1/longest-duration-movies');
 
-        $response->assertStatus(200);
+        $response->assertSuccessful();
         $response->assertExactJson([
             'data' => [],
             'message' => 'Success',
@@ -108,7 +108,7 @@ class MovieAPITest extends TestCase
             'genres' => 'Comedy',
         ]);
 
-        $response->assertStatus(200);
+        $response->assertSuccessful();
         $response->assertContent('success');
 
         $this->assertDatabaseHas('movies', [
@@ -126,6 +126,33 @@ class MovieAPITest extends TestCase
 
         $response->assertStatus(422);
         $response->assertExactJson($expectedResult);
+    }
+
+    public function testTopRatedMoviesReturnsEmptyArrayIfNoMovies()
+    {
+        $response = $this->get('/api/v1/top-rated-movies');
+
+        $response->assertSuccessful();
+        $response->assertExactJson([
+            'data' => [],
+            'message' => 'Success',
+            'errors' => [],
+            'error_code' => null
+        ]);
+    }
+
+    public function testGenreMoviesWithSubtotalsReturnsSuccess()
+    {
+        $response = $this->get('/api/v1/genre-movies-with-subtotals');
+
+        $response->assertSuccessful();
+    }
+
+    public function testUpdateRuntimeMinutesReturnsSuccess()
+    {
+        $response = $this->post('/api/v1/update-runtime-minutes');
+
+        $response->assertSuccessful();
     }
 
     public static function saveMovieValidationErrors(): array
