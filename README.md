@@ -17,9 +17,15 @@ From your project root directory, run
 ```
 This will perform a basic setup.
 
-Next fill in your db credentials in .env file, and run
+Next fill in your db credentials in .env file 
 ```
-php artisan migrate
+DB_DATABASE=databaseName
+DB_USERNAME=databaseUserName
+DB_PASSWORD=databaseUserPassword
+```
+Next Run
+```
+php artisan migrate --seed
 ```
 
 You can now run your application by running
