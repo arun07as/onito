@@ -223,7 +223,7 @@ class JsonResponsesTest extends TestCase
                 ],
                 []
             ],
-            'Arrayable as Data' => [
+            'Arrayable as Errors' => [
                 ['Message', 400, new TempArrayable('World')],
                 400,
                 [
@@ -234,13 +234,24 @@ class JsonResponsesTest extends TestCase
                 ],
                 []
             ],
-            'JsonSerializable as Data' => [
+            'JsonSerializable as Errors' => [
                 ['Msg', 400, new TempJsonSerializable('World')],
                 400,
                 [
                     'data' => [],
                     'message' => 'Msg',
                     'errors' => ['Hello' => 'World'],
+                    'error_code' => null
+                ],
+                []
+            ],
+            'NULL as Errors' => [
+                ['Msg', 400, null],
+                400,
+                [
+                    'data' => [],
+                    'message' => 'Msg',
+                    'errors' => [],
                     'error_code' => null
                 ],
                 []
