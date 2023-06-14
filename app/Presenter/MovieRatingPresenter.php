@@ -7,7 +7,7 @@ use App\Entities\MovieRating;
 class MovieRatingPresenter
 {
     public function __construct(
-        /** @var MovieRating[] $movieRatings */
+        /** @var MovieRating[] */
         private array $movieRatings
     ) {
     }
