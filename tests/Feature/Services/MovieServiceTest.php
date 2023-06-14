@@ -2,8 +2,10 @@
 
 namespace Tests\Feature\Services;
 
+use App\Entities\GenreVotes;
 use App\Entities\MovieData;
 use App\Entities\MovieRating;
+use App\Entities\MovieVotes;
 use App\Models\Movie;
 use App\Models\Rating;
 use App\Services\MovieService;
@@ -194,6 +196,77 @@ class MovieServiceTest extends TestCase
     public function testTopMoviesReturnsEmptyArrayWhenNoMovies(): void
     {
         $result = $this->service->topMovies();
+        $this->assertEquals($result, []);
+    }
+
+    public function testGenreMoviesWithSubTotalsReturnsArrayOfGenreVotes()
+    {
+        Movie::insert([
+            [
+                'id' => 1,
+                'tconst' => '1',
+                'title_type' => 'a',
+                'primary_title' => 'b',
+                'runtime_minutes' => 10,
+                'genres' => 'gn1',
+            ],
+            [
+                'id' => 2,
+                'tconst' => '2',
+                'title_type' => 'aa',
+                'primary_title' => 'ba',
+                'runtime_minutes' => 15,
+                'genres' => 'gn2',
+            ],
+            [
+                'id' => 3,
+                'tconst' => '3',
+                'title_type' => 'aaa',
+                'primary_title' => 'baa',
+                'runtime_minutes' => 40,
+                'genres' => 'gn1',
+            ],
+        ]);
+
+        Rating::insert([
+            [
+                'id' => 1,
+                'tconst' => '1',
+                'average_rating' => 1,
+                'num_votes' => 30,
+            ],
+            [
+                'id' => 2,
+                'tconst' => '2',
+                'average_rating' => 2,
+                'num_votes' => 40,
+            ],
+            [
+                'id' => 3,
+                'tconst' => '3',
+                'average_rating' => 3,
+                'num_votes' => 100,
+            ],
+        ]);
+
+        $expectedResult = [
+            new GenreVotes('gn1', 130, [
+                new MovieVotes('b', 30),
+                new MovieVotes('baa', 100),
+            ]),
+            new GenreVotes('gn2', 40, [
+                new MovieVotes('ba', 40),
+            ]),
+        ];
+
+        $result = $this->service->genreMoviesWithSubTotals();
+
+        $this->assertEquals($result, $expectedResult);
+    }
+
+    public function testGenreMoviesWithSubTotalsReturnsEmptyArrayWhenNoMovies(): void
+    {
+        $result = $this->service->genreMoviesWithSubTotals();
         $this->assertEquals($result, []);
     }
 
