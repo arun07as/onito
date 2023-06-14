@@ -245,7 +245,7 @@ class JsonResponsesTest extends TestCase
                 ],
                 []
             ],
-            'NULL as Errors' => [
+            'null as Errors' => [
                 ['Msg', 400, null],
                 400,
                 [

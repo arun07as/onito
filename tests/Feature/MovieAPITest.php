@@ -153,6 +153,12 @@ class MovieAPITest extends TestCase
         $response = $this->post('/api/v1/update-runtime-minutes');
 
         $response->assertSuccessful();
+        $response->assertExactJson([
+            'data' => [],
+            'message' => 'Updated Successfully',
+            'errors' => [],
+            'error_code' => null
+        ]);
     }
 
     public static function saveMovieValidationErrors(): array
