@@ -25,7 +25,7 @@ class SaveMovieRequest extends FormRequest
         return [
             'titleType' => ['bail', 'required', 'string', 'max:10'],
             'primaryTitle' => ['bail', 'required', 'string', 'max:150'],
-            'runtimeMinutes' => ['bail', 'required', 'integer', 'min:0', 'max:65535'],
+            'runtimeMinutes' => ['bail', 'required', 'integer', 'min:1', 'max:65535'],
             'genres' => ['bail', 'required', 'string', 'max:50'],
         ];
     }
